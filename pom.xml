@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+>
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ============================================ -->
+    <!-- COORDONNÉES DU PROJET                        -->
+    <!-- ============================================ -->
+    <groupId>eliel-starter-kits</groupId>
+    <artifactId>auth-jwt-starter</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Auth JWT Starter (Parent)</name>
+    <description>Spring Boot Starter for stateless JWT Authentication with HTTP-only Cookies, Refresh Token Rotation and Blacklisting</description>
+    <url>https://github.com/wendkuni90/auth-jwt-starter.git</url>
+
+    <!-- ============================================ -->
+    <!-- MODULES                                      -->
+    <!-- ============================================ -->
+    <modules>
+        <module>auth-jwt-autoconfigure</module>
+        <module>auth-jwt-spring-boot-starter</module>
+    </modules>
+
+    <!-- ============================================ -->
+    <!-- PROPRIÉTÉS                                   -->
+    <!-- ============================================ -->
+    <properties>
+        <!-- Versions Java et compilation -->
+        <java.version>17</java.version>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Version Spring Boot -->
+        <spring.boot.version>3.3.6</spring.boot.version>
+
+        <!-- Versions plugins Maven -->
+        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
+    </properties>
+
+    <!-- ============================================ -->
+    <!-- GESTION DES DÉPENDANCES                      -->
+    <!-- ============================================ -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot BOM (Bill of Materials) -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- ============================================ -->
+    <!-- BUILD                                        -->
+    <!-- ============================================ -->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Compilateur Maven -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <release>${java.version}</release>
+                    </configuration>
+                </plugin>
+
+                <!-- Plugin Spring Boot -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.version}</version>
+                </plugin>
+
+                <!-- Tests unitaires -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven-surefire-plugin.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>
