@@ -11,6 +11,14 @@ import org.springframework.validation.annotation.Validated;
 public class JwtProperties {
 
     /**
+     * Active/désactive le starter.
+     */
+    private boolean enabled = true;
+
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    /**
      * Secret utilisé pour signer les JWT (HMAC).
      * Recommandation: clé longue (>= 32 chars) en prod.
      */
