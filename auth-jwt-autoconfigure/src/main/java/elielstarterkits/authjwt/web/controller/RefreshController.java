@@ -4,15 +4,15 @@ import elielstarterkits.authjwt.properties.JwtProperties;
 import elielstarterkits.authjwt.token.JwtTokenProvider;
 import elielstarterkits.authjwt.token.refresh.RefreshTokenRotationService;
 import elielstarterkits.authjwt.token.refresh.RefreshTokenService;
+import elielstarterkits.authjwt.user.UserDetailsServiceAdapter;
 import elielstarterkits.authjwt.web.cookie.CookieService;
 import elielstarterkits.authjwt.web.dto.AuthResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -24,17 +24,20 @@ public class RefreshController {
     private final RefreshTokenRotationService rotationService;
     private final JwtTokenProvider tokenProvider;
     private final CookieService cookieService;
+    private final UserDetailsServiceAdapter userAdapter;
 
     public RefreshController(JwtProperties props,
                             RefreshTokenService refreshTokenService,
                             RefreshTokenRotationService rotationService,
                             JwtTokenProvider tokenProvider,
-                            CookieService cookieService) {
+                            CookieService cookieService,
+                            UserDetailsServiceAdapter userAdapter) {
         this.props = props;
         this.refreshTokenService = refreshTokenService;
         this.rotationService = rotationService;
         this.tokenProvider = tokenProvider;
         this.cookieService = cookieService;
+        this.userAdapter = userAdapter;
     }
 
     @PostMapping("/refresh")
@@ -52,10 +55,13 @@ public class RefreshController {
         // rotate refresh (invalidate old + issue new)
         String newRefreshJwt = rotationService.rotate(refreshJwt);
 
-        // create new access token
-        // roles are not stored in refresh token, so access roles will be empty unless app re-loads them.
-        // For now: empty roles (simple). Later we can optionally reload authorities via a hook.
-        String newAccessJwt = tokenProvider.generateAccessToken(refresh.getSubject(), List.of());
+        // create new access token (reload authorities from host app)
+        var userDetails = userAdapter.loadBySubject(refresh.getSubject());
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
+        String newAccessJwt = tokenProvider.generateAccessToken(refresh.getSubject(), roles);
 
         cookieService.setAccessTokenCookie(response, newAccessJwt);
         cookieService.setRefreshTokenCookie(response, newRefreshJwt);
@@ -70,4 +76,5 @@ public class RefreshController {
         }
         return null;
     }
+
 }
